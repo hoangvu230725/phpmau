@@ -1,0 +1,127 @@
+Báo cáo docker
+B1:Cập Nhật Hệ Thống
+sudo apt update
+sudo apt upgrade -y
+
+
+B2: Cài Đặt Các Gói Phụ Thuộc
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+
+B3: Thêm Kho Chứa Docker vào Hệ Thống
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+Sau đó, thêm kho chứa Docker vào danh sách kho nguồn của hệ thống:
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+B5:  Cập nhật lại
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io -y
+
+B6: Xác Nhận Cài Đặt Docker
+Kiểm tra xem Docker đã được cài đặt thành công chưa bằng cách chạy lệnh:
+sudo docker --version
+Lệnh trên sẽ trả về phiên bản của Docker mà bạn vừa cài đặt. Nếu Docker đã được cài đặt đúng, bạn sẽ thấy kết quả giống như:
+
+Docker version 20.10.7, build f0df350
+
+
+B7: Cài Đặt Docker Compose
+
+Để cài đặt Docker Compose, chạy lệnh sau:
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+Sau khi tải về, cấp quyền thực thi cho tệp docker-compose:
+sudo chmod +x /usr/local/bin/docker-compose
+
+B8: Kiểm Tra Phiên Bản Docker Compose
+
+Kiểm tra xem Docker Compose đã được cài đặt thành công chưa:
+
+docker-compose --version
+
+Nếu cài đặt thành công, bạn sẽ nhận được kết quả tương tự:
+
+docker-compose version 1.29.2, build 5becea4c
+
+
+
+B9: Tạo file
+
+nano docker-compose.yml
+Ghi nội dung
+version: '3.8'
+
+services:
+  # Apache + PHP
+  web:
+    build: .
+    container_name: apache_php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./www:/var/www/html
+    depends_on:
+      - db
+
+  # MySQL
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3306:3306"
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+B10: Tạo file
+ Nano Dockerfile
+Nội dung 
+ FROM php:7.4-apache
+
+# Cài đặt các extension cần thiết, bao gồm mysqli
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd mysqli
+RUN docker-php-ext-install pdo pdo_mysql
+# Cài đặt phpMyAdmin (tuỳ chọn)
+RUN apt-get install -y libmcrypt-dev
+
+
+B11:
+Vào terminal nhập lệnh 
+sudo docker-compose up --build -d
+
+
+
+
+
+
+B12: Truy cập đường dẫn trong docker-compose.yml (tùy vào cấu hình docker-compose.yml )
+
+Xong vào đường dẫn để đặt tất cả file php
+
+B13: Truy cập địa chỉ localhost:8081 (tùy vào cấu hình docker-compose.yml )
+Để truy cập phpmyadmin
+
+
+B14: Truy cập localhost:8080 để run trang web
+Kết quả
+
+Lệnh dừng docker
+sudo docker-compose down
+Lệnh chạy docker
+sudo docker-compose up -d
+
